@@ -1,0 +1,6 @@
+*.so
+*.fatbin
+*.log
+build/
+output*/
+traces/
