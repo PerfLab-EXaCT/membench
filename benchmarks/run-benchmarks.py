@@ -198,4 +198,5 @@ def main():
         run_benchmarks()
 
 if __name__ == '__main__':
+    # TODO: Handle USE_CUSTOM_AFFINITY from CLI args
     main()

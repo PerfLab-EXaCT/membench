@@ -13,3 +13,6 @@
 [submodule "benchmarks/sw4lite"]
 	path = benchmarks/sw4lite
 	url = https://github.com/geodynamics/sw4lite
+[submodule "benchmarks/STREAM"]
+	path = benchmarks/STREAM
+	url = https://github.com/jeffhammond/STREAM.git
