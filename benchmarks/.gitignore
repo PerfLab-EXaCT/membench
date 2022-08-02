@@ -1,4 +1,8 @@
-**/*
-!**/
-!NPB3.4-OMP/**
-!omp-test/**
+amg/
+darknet/
+minivite-x/
+gapbs/
+STREAM/
+NPB3.4-OMP/**
+result*
+pointsource*
