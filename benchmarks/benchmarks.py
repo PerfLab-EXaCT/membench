@@ -8,7 +8,7 @@ from datetime import datetime
 
 dtnow = lambda: datetime.now().strftime("%m_%d_%Y-%H_%M_%S")
 OMP_AFFINITY = None
-USE_CUSTOM_AFFINITY = True
+USE_DEFAULT_OMP_POLICY = False
 RESULTS_FOLDER = f'results_{dtnow()}'
 omp_threads = [1] + [x for x in range(2, 17, 2)]
 cpuid = list(range(0, 15, 2)) + list(range(16, 24))
@@ -68,7 +68,7 @@ def amg():
             env = {
                 'OMP_NUM_THREADS': str(omp_thd),
             };
-            if USE_CUSTOM_AFFINITY:
+            if USE_DEFAULT_OMP_POLICY or OMP_AFFINITY == 'false':
                 env['OMP_PROC_BIND'] = OMP_AFFINITY
             else:
                 env['OMP_PLACES'] = get_omp_places(omp_thd, OMP_AFFINITY)
@@ -114,7 +114,7 @@ def gapbs():
                 env = {
                     'OMP_NUM_THREADS': str(omp_thd),
                 };
-                if USE_CUSTOM_AFFINITY:
+                if USE_DEFAULT_OMP_POLICY:
                     env['OMP_PROC_BIND'] = OMP_AFFINITY
                 else:
                     env['OMP_PLACES'] = get_omp_places(omp_thd, OMP_AFFINITY)
@@ -134,33 +134,34 @@ def gapbs():
 def minivite_x():
     print('Running miniVite-x:')
     BIN_PATH = 'minivite-x/miniVite-v3'
-    sizes = [x for x in range(300000, 600001, 100000)]    
+    IN_PATH = 'minivite-x/inputs/arabic-2005.bin'
+    # sizes = [x for x in range(300000, 600001, 100000)]   
     with open(f'{RESULTS_FOLDER}/{OMP_AFFINITY}/minivite_x-{dtnow()}.csv', 'w', encoding='UTF8') as f:
         writer = csv.writer(f)
         writer.writerow(['omp_threads', 'size', 'solve_time(seconds)'])
         pbar_thrds = tqdm.tqdm(omp_threads, ncols=100)
-        pbar_sizes = tqdm.tqdm(sizes, ncols=80)
+        # pbar_sizes = tqdm.tqdm(sizes, ncols=80)
         for omp_thd in pbar_thrds:
             pbar_thrds.set_description(f'[miniVite-x] OMP Threads (current={omp_thd})')
             env = {
                 'OMP_NUM_THREADS': str(omp_thd),
             };
-            if USE_CUSTOM_AFFINITY:
+            if USE_DEFAULT_OMP_POLICY:
                 env['OMP_PROC_BIND'] = OMP_AFFINITY
             else:
                 env['OMP_PLACES'] = get_omp_places(omp_thd, OMP_AFFINITY)
-            for sz in pbar_sizes:
+            # for sz in pbar_sizes:
                 # for pb in problem:
-                pbar_sizes.set_description(f'[miniVite-x] Running with n={sz}')
-                output = subprocess.Popen(
-                    [BIN_PATH,'add','-n', str(sz)], 
-                    env=env,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE
-                ).wait()
-                lines = output.stdout.readlines()
-                avg_time = float(lines[-2].strip().split()[-1])
-                writer.writerow([omp_thd,sz,avg_time])
+                # pbar_sizes.set_description(f'[miniVite-x] Running with n={sz}')
+            output = subprocess.Popen(
+                [BIN_PATH,'add','-f', IN_PATH], 
+                env=env,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+            ).wait()
+            lines = output.stdout.readlines()
+            avg_time = float(lines[-2].strip().split()[-1])
+            writer.writerow([omp_thd,avg_time])
 
 def sw4lite():
     print('Running sw4lite:')
@@ -173,7 +174,7 @@ def sw4lite():
             env = {
                 'OMP_NUM_THREADS': str(omp_thd),
             }
-            if USE_CUSTOM_AFFINITY:
+            if USE_DEFAULT_OMP_POLICY:
                 env['OMP_PROC_BIND'] = OMP_AFFINITY
             else:
                 env['OMP_PLACES'] = get_omp_places(omp_thd, OMP_AFFINITY)
@@ -204,7 +205,7 @@ def nbp():
                 env = {
                     'OMP_NUM_THREADS': str(omp_thd),
                 };
-                if USE_CUSTOM_AFFINITY:
+                if USE_DEFAULT_OMP_POLICY:
                     env['OMP_PROC_BIND'] = OMP_AFFINITY
                 else:
                     env['OMP_PLACES'] = get_omp_places(omp_thd, OMP_AFFINITY)
@@ -229,7 +230,9 @@ def stream():
             env = {
                 'OMP_NUM_THREADS': str(omp_thd),
             };
-            if USE_CUSTOM_AFFINITY:
+            if OMP_AFFINITY == 'None':
+                en
+            elif USE_DEFAULT_OMP_POLICY:
                 env['OMP_PROC_BIND'] = OMP_AFFINITY
             else:
                 env['OMP_PLACES'] = get_omp_places(omp_thd, OMP_AFFINITY)
@@ -261,8 +264,8 @@ def init():
 
 def run():
     global OMP_AFFINITY
-    affinities = ['spread', 'close']
-    if USE_CUSTOM_AFFINITY:
+    affinities = ['spread', 'close', 'false']
+    if USE_DEFAULT_OMP_POLICY:
         affinities += ['P-spread', 'E-spread']
     for affinity in affinities:
         OMP_AFFINITY = affinity
@@ -270,8 +273,8 @@ def run():
         run_benchmarks()
 
 def use_default():
-    global USE_CUSTOM_AFFINITY
-    USE_CUSTOM_AFFINITY = False
+    global USE_DEFAULT_OMP_POLICY
+    USE_DEFAULT_OMP_POLICY = False
 
 def print_all_benchmarks():
     print(
@@ -286,7 +289,6 @@ def print_all_benchmarks():
 """
     )
 
-
 def main():
     parser = argparse.ArgumentParser(
         prog='benchmarks.py',
@@ -300,8 +302,8 @@ def main():
     args = parser.parse_args()
 
     if args.default:
-        global USE_CUSTOM_AFFINITY
-        USE_CUSTOM_AFFINITY = False
+        global USE_DEFAULT_OMP_POLICY
+        USE_DEFAULT_OMP_POLICY = False
 
     if args.list:
         print_all_benchmarks()
@@ -312,8 +314,6 @@ def main():
     else:
         parser.print_help()
     
-
-
 if __name__ == '__main__':
     # TODO: Handle USE_CUSTOM_AFFINITY from CLI args
     main()
