@@ -279,7 +279,7 @@ def init():
     os.makedirs(f'{RESULTS_FOLDER}/{OMP_AFFINITY}', exist_ok=True)
 
 def run():
-    # run_mlc()
+    run_mlc()
     global OMP_AFFINITY
     affinities = ['spread', 'close', 'false']
     if USE_DEFAULT_OMP_POLICY:
