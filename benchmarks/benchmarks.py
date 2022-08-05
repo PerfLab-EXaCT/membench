@@ -85,7 +85,7 @@ def amg():
                     stderr=subprocess.PIPE
                 ).wait()
                 times = []
-                for line in output.stdout:
+                for line in output.stdout.readlines():
                     if 'wall clock time' in str(line):
                         splits = line.split()
                         times.append(float(splits[4]))
@@ -279,7 +279,7 @@ def init():
     os.makedirs(f'{RESULTS_FOLDER}/{OMP_AFFINITY}', exist_ok=True)
 
 def run():
-    run_mlc()
+    # run_mlc()
     global OMP_AFFINITY
     affinities = ['spread', 'close', 'false']
     if USE_DEFAULT_OMP_POLICY:
