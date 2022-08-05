@@ -70,5 +70,5 @@
 
 - [x] Test with NO affinity (`OMP_PROC_BIND=false`)
 - [x] Use arabic graph for miniVite-x
-- [ ] Add Intel® Memory Latency Checker (Random R/W) to benchmarks
+- [x] Add Intel® Memory Latency Checker (Random R/W) to benchmarks
 - [ ] OMP scheduling (make sure to have same scheduling constructs within the workloads)

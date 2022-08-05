@@ -8,7 +8,7 @@
 # Write (1:1), PMEM (via file system)
 ./mlc 0-47 -W5 seq -b 10000 pmem /pmem1
 ```
-  
+
 ### Random access bandwidth/dram
 
 ```sh
@@ -19,7 +19,7 @@
 ### Idle latency
 
 ```sh
-./mlc -idle_latency -r  # use to validate ripples
+./mlc --idle_latency -r  # use to validate ripples
 ```
 
 ## References

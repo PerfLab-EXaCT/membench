@@ -114,7 +114,7 @@ def gapbs():
                 env = {
                     'OMP_NUM_THREADS': str(omp_thd),
                 };
-                if USE_DEFAULT_OMP_POLICY:
+                if USE_DEFAULT_OMP_POLICY or OMP_AFFINITY == 'false':
                     env['OMP_PROC_BIND'] = OMP_AFFINITY
                 else:
                     env['OMP_PLACES'] = get_omp_places(omp_thd, OMP_AFFINITY)
@@ -146,7 +146,7 @@ def minivite_x():
             env = {
                 'OMP_NUM_THREADS': str(omp_thd),
             };
-            if USE_DEFAULT_OMP_POLICY:
+            if USE_DEFAULT_OMP_POLICY or OMP_AFFINITY == 'false':
                 env['OMP_PROC_BIND'] = OMP_AFFINITY
             else:
                 env['OMP_PLACES'] = get_omp_places(omp_thd, OMP_AFFINITY)
@@ -174,7 +174,7 @@ def sw4lite():
             env = {
                 'OMP_NUM_THREADS': str(omp_thd),
             }
-            if USE_DEFAULT_OMP_POLICY:
+            if USE_DEFAULT_OMP_POLICY or OMP_AFFINITY == 'false':
                 env['OMP_PROC_BIND'] = OMP_AFFINITY
             else:
                 env['OMP_PLACES'] = get_omp_places(omp_thd, OMP_AFFINITY)
@@ -205,7 +205,7 @@ def nbp():
                 env = {
                     'OMP_NUM_THREADS': str(omp_thd),
                 };
-                if USE_DEFAULT_OMP_POLICY:
+                if USE_DEFAULT_OMP_POLICY or OMP_AFFINITY == 'false':
                     env['OMP_PROC_BIND'] = OMP_AFFINITY
                 else:
                     env['OMP_PLACES'] = get_omp_places(omp_thd, OMP_AFFINITY)
@@ -230,9 +230,7 @@ def stream():
             env = {
                 'OMP_NUM_THREADS': str(omp_thd),
             };
-            if OMP_AFFINITY == 'None':
-                en
-            elif USE_DEFAULT_OMP_POLICY:
+            if USE_DEFAULT_OMP_POLICY or OMP_AFFINITY == 'false':
                 env['OMP_PROC_BIND'] = OMP_AFFINITY
             else:
                 env['OMP_PLACES'] = get_omp_places(omp_thd, OMP_AFFINITY)
@@ -259,10 +257,29 @@ def run_benchmarks():
         nbp()
         stream()
 
+def run_mlc():
+    print('Running IntelMLC:')
+    BIN_PATH = 'IntelMLC/mlc'
+    os.makedirs(f'{RESULTS_FOLDER}/IntelMLC', exist_ok=True)
+    inputs = ['randR', 'randW5', 'seqR', 'seqW5']
+    pbar_itrs = tqdm.tqdm(range(3), ncols=100)
+    for i in pbar_itrs:
+        pbar_itrs.set_description(f'[IntelMLC] Running iteration = {i}')
+        pbar_inps = tqdm.tqdm(inputs, ncols=80)
+        for inp in pbar_inps:
+            pbar_inps.set_description(f'[IntelMLC] Running with config={inp}.config')
+            with open(f'{RESULTS_FOLDER}/IntelMLC/{inp}_{dtnow()}.out', 'wb') as out:
+                subprocess.Popen(
+                    ['sudo', BIN_PATH, '--loaded_latency', f'-oIntelMLC/configs/{inp}.config'], 
+                    stdout=out,
+                    stderr=out
+                ).wait()
+
 def init():
     os.makedirs(f'{RESULTS_FOLDER}/{OMP_AFFINITY}', exist_ok=True)
 
 def run():
+    run_mlc()
     global OMP_AFFINITY
     affinities = ['spread', 'close', 'false']
     if USE_DEFAULT_OMP_POLICY:
