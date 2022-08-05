@@ -83,7 +83,8 @@ def amg():
                     env=env,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE
-                ).wait()
+                )
+                output.wait()
                 times = []
                 for line in output.stdout.readlines():
                     if 'wall clock time' in str(line):
@@ -126,7 +127,8 @@ def gapbs():
                         env=env,
                         stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE
-                    ).wait()
+                    )
+                    output.wait()
                     lines = output.stdout.readlines()
                     avg_time = float(lines[-1].strip().split()[-1])
                     writer.writerow([omp_thd,sz,avg_time])
@@ -158,7 +160,8 @@ def minivite_x():
                 env=env,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
-            ).wait()
+            )
+            output.wait()
             lines = output.stdout.readlines()
             avg_time = float(lines[-2].strip().split()[-1])
             writer.writerow([omp_thd,avg_time])
@@ -184,7 +187,8 @@ def sw4lite():
                 env=env,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
-            ).wait()
+            )
+            output.wait()
             lines = output.stdout.readlines()
             time = float(lines[-5].strip().split()[0])
             writer.writerow([omp_thd,time])
@@ -214,7 +218,8 @@ def nbp():
                     env=env,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE
-                ).wait()
+                )
+                output.wait()
                 lines = output.stdout.readlines()
                 avg_time = float(lines[-26].strip().split()[-1])
                 writer.writerow([omp_thd,avg_time])
@@ -240,7 +245,8 @@ def stream():
                 env=env,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
-            ).wait()
+            )
+            output.wait()
             lines = output.stdout.readlines()
             for line in lines[-7:-3]:
                 splits = line.strip().split()
