@@ -288,7 +288,7 @@ def run():
     run_mlc()
     global OMP_AFFINITY
     affinities = ['spread', 'close', 'false']
-    if USE_DEFAULT_OMP_POLICY:
+    if not USE_DEFAULT_OMP_POLICY:
         affinities += ['P-spread', 'E-spread']
     for affinity in affinities:
         OMP_AFFINITY = affinity
@@ -297,7 +297,7 @@ def run():
 
 def use_default():
     global USE_DEFAULT_OMP_POLICY
-    USE_DEFAULT_OMP_POLICY = False
+    USE_DEFAULT_OMP_POLICY = True
 
 def print_all_benchmarks():
     print(
