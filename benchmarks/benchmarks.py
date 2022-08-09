@@ -140,7 +140,7 @@ def minivite_x():
     # sizes = [x for x in range(300000, 600001, 100000)]   
     with open(f'{RESULTS_FOLDER}/{OMP_AFFINITY}/minivite_x-{dtnow()}.csv', 'w', encoding='UTF8') as f:
         writer = csv.writer(f)
-        writer.writerow(['omp_threads', 'size', 'solve_time(seconds)'])
+        writer.writerow(['omp_threads', 'solve_time(seconds)'])
         pbar_thrds = tqdm.tqdm(omp_threads, ncols=100)
         # pbar_sizes = tqdm.tqdm(sizes, ncols=80)
         for omp_thd in pbar_thrds:
