@@ -72,3 +72,8 @@
 - [x] Use arabic graph for miniVite-x
 - [x] Add Intel® Memory Latency Checker (Random R/W) to benchmarks
 - [ ] OMP scheduling (make sure to have same scheduling constructs within the workloads)
+- [ ] Option to enable/disable HFI (to compare it with no affinity case)
+- [ ] Option to enable/disable Hyperthreading
+- [ ] Use `memgaze` to do CPUID aware memory analysis
+- [ ] Figure out how to use `darknet` benchmark
+- [ ] Compare benchmarks across architectures (homogenous/heterogenous & desktop/server) 
