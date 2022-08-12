@@ -266,21 +266,37 @@ def run_benchmarks():
 def run_mlc():
     print('Running IntelMLC:')
     BIN_PATH = 'IntelMLC/mlc'
-    os.makedirs(f'{RESULTS_FOLDER}/IntelMLC', exist_ok=True)
+    policies = ['spread', 'P-spread', 'E-spread']
     inputs = ['randR', 'randW5', 'seqR', 'seqW5']
-    pbar_itrs = tqdm.tqdm(range(3), ncols=100)
+
+    os.makedirs(f'{RESULTS_FOLDER}/IntelMLC', exist_ok=True)
+
+    pbar_itrs = tqdm.tqdm(range(3), ncols=60)
+    pbar_pols = tqdm.tqdm(policies, ncols=80)
+    pbar_inps = tqdm.tqdm(inputs, ncols=100)
+
     for i in pbar_itrs:
         pbar_itrs.set_description(f'[IntelMLC] Running iteration = {i}')
-        pbar_inps = tqdm.tqdm(inputs, ncols=80)
-        for inp in pbar_inps:
-            pbar_inps.set_description(f'[IntelMLC] Running with config={inp}.config')
-            with open(f'{RESULTS_FOLDER}/IntelMLC/{inp}_{dtnow()}.out', 'wb') as out:
-                subprocess.Popen(
-                    ['sudo', BIN_PATH, '--loaded_latency', f'-oIntelMLC/configs/{inp}.config'], 
-                    stdout=out,
-                    stderr=out
-                ).wait()
-
+        for pol in pbar_pols:
+            pbar_pols.set_description(f'[IntelMLC] Current Policy = {pol}')
+            os.makedirs(f'{RESULTS_FOLDER}/IntelMLC/{pol}', exist_ok=True)
+            for inp in pbar_inps:
+                pbar_inps.set_description(f'[IntelMLC] Running with config={inp}.config')
+                with open(f'{RESULTS_FOLDER}/IntelMLC/{pol}/{inp}_{dtnow()}.csv', 'w', encoding='UTF8') as f:
+                    writer = csv.writer(f)
+                    writer.writerow(['InjectDelay', 'Latency(ns)', 'Bandwidth(MB/s)'])
+                    output = subprocess.Popen(
+                        ['sudo', BIN_PATH, '--loaded_latency', f'-oIntelMLC/configs/{pol}/{inp}.config'], 
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE
+                    )
+                    output.wait()
+                    lines = output.stdout.readlines()
+                    for line in lines[-19:]:
+                        splits = line.strip().split()
+                        if len(splits) == 3:
+                            writer.writerow([int(splits[0]), float(splits[1]), float(splits[2])])
+                    
 def init():
     os.makedirs(f'{RESULTS_FOLDER}/{OMP_AFFINITY}', exist_ok=True)
 
