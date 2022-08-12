@@ -9,6 +9,7 @@ from datetime import datetime
 dtnow = lambda: datetime.now().strftime("%m_%d_%Y-%H_%M_%S")
 OMP_AFFINITY = None
 USE_DEFAULT_OMP_POLICY = False
+RUN_INTEL_MLC = False
 RESULTS_FOLDER = f'results_{dtnow()}'
 omp_threads = [1] + [x for x in range(2, 17, 2)]
 cpuid = list(range(0, 15, 2)) + list(range(16, 24))
@@ -301,7 +302,10 @@ def init():
     os.makedirs(f'{RESULTS_FOLDER}/{OMP_AFFINITY}', exist_ok=True)
 
 def run():
-    run_mlc()
+    if RUN_INTEL_MLC:
+        print('Intel MLC needs to be run at root priviledges. Please enter password when prompted!!')
+        run_mlc()
+        
     global OMP_AFFINITY
     affinities = ['spread', 'close', 'false']
     if not USE_DEFAULT_OMP_POLICY:
@@ -335,6 +339,7 @@ def main():
     )
     group = parser.add_mutually_exclusive_group()
     parser.add_argument('-d', '--default', action='store_true', help='Use default OMP spread/close policies (Ignores P/E-spread policies)')
+    parser.add_argument('-i', '--intel', action='store_true', required=False, help='run intel mlc')
     group.add_argument('-l', '--list', action='store_true', required=False, help='list all benchmarks')
     group.add_argument('-p', '--places', action='store_true', required=False, help='list all OMP places')
     group.add_argument('-r', '--run', action='store_true', required=False, help='run the benchmarks')
@@ -343,6 +348,10 @@ def main():
     if args.default:
         global USE_DEFAULT_OMP_POLICY
         USE_DEFAULT_OMP_POLICY = False
+    
+    if args.intel:
+        global RUN_INTEL_MLC
+        RUN_INTEL_MLC = True
 
     if args.list:
         print_all_benchmarks()
