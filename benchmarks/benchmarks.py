@@ -315,10 +315,6 @@ def run():
         init()
         run_benchmarks()
 
-def use_default():
-    global USE_DEFAULT_OMP_POLICY
-    USE_DEFAULT_OMP_POLICY = True
-
 def print_all_benchmarks():
     print(
 """
@@ -347,8 +343,10 @@ def main():
 
     if args.default:
         global USE_DEFAULT_OMP_POLICY
-        USE_DEFAULT_OMP_POLICY = False
-    
+        global omp_threads
+        USE_DEFAULT_OMP_POLICY = True
+        omp_threads = [1] + [x for x in range(2, 25, 2)]
+
     if args.intel:
         global RUN_INTEL_MLC
         RUN_INTEL_MLC = True
